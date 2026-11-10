@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>The Inference Mirror</title>
+</head>
+<body>
+
+    <h2>The Inference Mirror</h2>
+
+    <label>Browsing Hours: <input type="number" id="hours" value="4"></label><br><br>
+    <label><input type="checkbox" id="lateNight"> Active past midnight</label><br><br>
+    
+    <button onclick="runAI()">Run AI Inference</button>
+
+    <h3 id="result" style="display:none; margin-top:20px;">
+        AI Output: <span id="output" style="color: red;"></span>
+    </h3>
+
+    <script>
+        function runAI() {
+            let lateNight = document.getElementById('lateNight').checked;
+            let browsingHours = Number(document.getElementById('hours').value);
+            let outputText = "";
+
+            if (lateNight)  {
+                outputText = "High Stress / Impulse Pattern Detected (Triggered by late-night activity).";
+            }else if (browsingHours>4)  {
+                outputText = "High Stress / Impulse Pattern Detected (Triggered by late-night activity).";
+            }else if (browsingHours<4)  {
+                outputText = "Stable Pattern Detected (Low risk).";
+            }else {
+                outputText = "Stable Pattern Detected (Low risk).";
+            }
+
+            document.getElementById('output').innerText = outputText;
+            document.getElementById('result').style.display = 'block';
+        }
+    </script>
+
+</body>
+</html>
