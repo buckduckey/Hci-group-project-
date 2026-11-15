@@ -1,6 +1,9 @@
 import json
 import urllib.request
 import urllib.error
+import logging
+
+logger = logging.getLogger(__name__)
 
 def infer_from_data(data):
     requirement = """Utilize all given information in the data, list all personal or sensitive information that can be inferred from it. Reply strictly as valid JSON in this exact format: {"key_info": [{"info": "...", "evidence": "...", "confidence": 100}], "conclusion": "..."}"""
@@ -23,16 +26,16 @@ def infer_from_data(data):
     )
     
     try:
-        print("-> Attempting connection to local Ollama (llama3.2:1b)...")
+        logger.info("Attempting connection to local Ollama (llama3.2:1b)...")
         # Set a short timeout so it doesn't leave you hanging if Ollama isn't serving
         with urllib.request.urlopen(request, timeout=5) as response:
             result = json.loads(response.read().decode())
-            print("-> Successfully received response from local LLM!")
+            logger.info("Received response from local LLM")
             output = json.loads(result["message"]["content"])
             return output
             
     except Exception as err:
-        print(f"-> Local Ollama offline or timed out ({err}). Using intelligent simulation fallback.")
+        logger.warning("Local Ollama offline or timed out (%s). Using simulation fallback.", err)
         
         # Fallback dossier ensuring your UI always populates instantly with rich academic data
         return {
