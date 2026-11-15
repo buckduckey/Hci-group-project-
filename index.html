@@ -135,7 +135,17 @@
                 });
                 
                 let data = await response.json();
-                
+
+                // The backend reports model failures as an error status; show them instead of results
+                if (!response.ok) {
+                    document.getElementById('conclusionOutput').innerText = "No inference available";
+                    let errorItem = document.createElement('li');
+                    errorItem.style.color = '#ff6b6b';
+                    errorItem.textContent = data.error || "The server could not produce an inference.";
+                    document.getElementById('keyInfoList').replaceChildren(errorItem);
+                    return;
+                }
+
                 document.getElementById('conclusionOutput').innerText = data.conclusion || "Analysis complete.";
                 
                 let keyInfoHTML = "";
