@@ -147,7 +147,7 @@
                 
                 let data = await response.json();
 
-                // The server rejects invalid input with an error status; show it instead of results
+                // The backend reports model failures as an error status; show them instead of results
                 if (!response.ok) {
                     document.getElementById('conclusionOutput').innerText = "No inference available";
                     let errorItem = document.createElement('li');
