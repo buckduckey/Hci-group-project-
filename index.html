@@ -9,6 +9,7 @@
         .question-box label { font-weight: bold; display: block; margin-bottom: 5px; color: #ff6b6b; }
         button { background: #d9534f; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-size: 1em; width: 100%; font-weight: bold; }
         button:hover { background: #c9302c; }
+        button:disabled { background: #777; cursor: not-allowed; }
         .result-card { background: #222; border-left: 4px solid #0275d8; }
         .dossier-section { background: #1a1a1a; padding: 12px 15px; border-radius: 6px; margin-top: 10px; border-left: 4px solid #f0ad4e; }
         .dossier-section h5 { margin: 0 0 8px 0; color: #f0ad4e; font-size: 1.05em; }
@@ -26,7 +27,7 @@
         <div class="question-box">
             <label>Q1: Digital Habituation & Session Length</label>
             <span>Estimated daily active hours spent interacting with digital interfaces:</span>
-            <input type="number" id="q1" value="6">
+            <input type="number" id="q1" value="6" min="0" max="24" step="any" required>
         </div>
 
         <div class="question-box">
@@ -91,7 +92,7 @@
             <label style="font-weight: normal; color: #ccc;"><input type="checkbox" id="q11" checked> IP-derived location history and cross-device advertising IDs linked</label>
         </div>
         
-        <button onclick="runAI()">Execute AI Surveillance Simulation</button>
+        <button id="runButton" onclick="runAI()">Execute AI Surveillance Simulation</button>
     </div>
 
     <div class="card result-card" id="result" style="display:none;">
@@ -109,8 +110,18 @@
 
     <script>
         async function runAI() {
+            const hoursInput = document.getElementById('q1');
+            // Block blank, negative or impossible hours before anything is sent
+            if (!hoursInput.reportValidity()) {
+                return;
+            }
+
+            const runButton = document.getElementById('runButton');
+            // One request at a time, so a late response can't overwrite a newer one
+            runButton.disabled = true;
+
             let payload = {
-                q1: document.getElementById('q1').value,
+                q1: Number(hoursInput.value),
                 q2: document.getElementById('q2').checked,
                 q3: document.getElementById('q3').value,
                 q4: document.getElementById('q4').value,
@@ -124,7 +135,7 @@
             };
 
             document.getElementById('conclusionOutput').innerText = "Querying Local Llama 3.2 Model via Python API...";
-            document.getElementById('keyInfoList').innerHTML = "<li>Processing telemetry streams...</li>";
+            document.getElementById('keyInfoList').replaceChildren(makeListItem("Processing telemetry streams..."));
             document.getElementById('result').style.display = 'block';
 
             try {
@@ -135,25 +146,57 @@
                 });
                 
                 let data = await response.json();
-                
-                document.getElementById('conclusionOutput').innerText = data.conclusion || "Analysis complete.";
-                
-                let keyInfoHTML = "";
-                if (data.key_info && Array.isArray(data.key_info)) {
-                    data.key_info.forEach(item => {
-                        keyInfoHTML += `<li><strong>${item.info}</strong> (Confidence: ${item.confidence}%)<br><span style="color:#aaa; font-size:0.9em;">Evidence: ${item.evidence}</span></li>`;
-                    });
-                } else {
-                    keyInfoHTML = "<li>No structured traits returned.</li>";
+
+                // The server rejects invalid input with an error status; show it instead of results
+                if (!response.ok) {
+                    document.getElementById('conclusionOutput').innerText = "No inference available";
+                    let errorItem = document.createElement('li');
+                    errorItem.style.color = '#ff6b6b';
+                    errorItem.textContent = data.error || "The server could not produce an inference.";
+                    document.getElementById('keyInfoList').replaceChildren(errorItem);
+                    return;
                 }
-                
-                document.getElementById('keyInfoList').innerHTML = keyInfoHTML;
-                
+
+                document.getElementById('conclusionOutput').innerText = data.conclusion || "Analysis complete.";
+
+                // Model output is untrusted text: build the items as nodes, never as HTML
+                if (data.key_info && Array.isArray(data.key_info)) {
+                    document.getElementById('keyInfoList').replaceChildren(...data.key_info.map(makeInferenceItem));
+                } else {
+                    document.getElementById('keyInfoList').replaceChildren(makeListItem("No structured traits returned."));
+                }
+
             } catch (err) {
                 console.error(err);
                 document.getElementById('conclusionOutput').innerText = "Connection Error";
-                document.getElementById('keyInfoList').innerHTML = "<li style='color:#ff6b6b;'>Failed to connect to Python backend. Ensure app.py is running on port 5000 and Ollama is active!</li>";
+                let errorItem = makeListItem("Failed to connect to Python backend. Ensure app.py is running on port 5000 and Ollama is active!");
+                errorItem.style.color = '#ff6b6b';
+                document.getElementById('keyInfoList').replaceChildren(errorItem);
+            } finally {
+                runButton.disabled = false;
             }
+        }
+
+        function makeListItem(text) {
+            const li = document.createElement('li');
+            li.textContent = text;
+            return li;
+        }
+
+        function makeInferenceItem(item) {
+            const li = document.createElement('li');
+
+            const info = document.createElement('strong');
+            info.textContent = String(item.info ?? '');
+            li.append(info, ` (Confidence: ${String(item.confidence ?? '?')}%)`, document.createElement('br'));
+
+            const evidence = document.createElement('span');
+            evidence.style.color = '#aaa';
+            evidence.style.fontSize = '0.9em';
+            evidence.textContent = `Evidence: ${String(item.evidence ?? '')}`;
+            li.append(evidence);
+
+            return li;
         }
     </script>
 
