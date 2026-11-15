@@ -1,12 +1,22 @@
+import logging
+from pathlib import Path
+
+from flask import Flask, request, jsonify, send_from_directory
 import math
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from LLM import infer_from_data, InferenceError
 
+BASE_DIR = Path(__file__).resolve().parent
+
 app = Flask(__name__)
 CORS(app)
 
+@app.route('/')
+def index():
+    # Serve only the page itself, not the whole project folder
+    return send_from_directory(BASE_DIR, 'index.html')
 MAX_DAILY_HOURS = 24
 
 
@@ -59,4 +69,5 @@ def infer():
     return jsonify(result)
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(name)s: %(message)s')
     app.run(debug=True, port=5000)
