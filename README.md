@@ -57,6 +57,6 @@ Status messages (model requests, failures) are written to the terminal that runs
 ## Use of AI tools
 
 - **In the product:** the inferences shown to the user are generated at run time by Meta's `llama3.2:1b` model, run locally through Ollama.
-- **In development:** Claude Code (Anthropic) was used to review the code against the brief and to write this README.
+- **In development:** Claude Code (Anthropic) and Gemini (Google) were used to review the code against the brief and to write this README.
 
 <!-- TODO (team): list any other AI tools used for code, design, data or the report, and what each was used for, before submission. -->
