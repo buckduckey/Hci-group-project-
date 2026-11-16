@@ -2,7 +2,7 @@ import json
 import urllib.request
 
 OLLAMA_URL = "http://localhost:11434/api/chat"
-MODEL = "llama3.2:1b"
+MODEL = "llama3.2:3b"
 TIMEOUT_SECONDS = 60
 # Upper bound on the reply length. Without it the model can get stuck repeating
 # itself until it fills its whole context window, which takes minutes.
