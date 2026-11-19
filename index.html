@@ -1,204 +1,184 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>The Inference Mirror - HCI Simulation Sandbox</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background: #1a1a1a; color: #f4f4f9; line-height: 1.5; }
-        .card { background: #2a2a2a; padding: 25px; border-radius: 8px; margin-bottom: 20px; max-width: 750px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 1px solid #444; }
-        .question-box { background: #333; padding: 15px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid #d9534f; }
-        .question-box label { font-weight: bold; display: block; margin-bottom: 5px; color: #ff6b6b; }
-        button { background: #d9534f; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-size: 1em; width: 100%; font-weight: bold; }
-        button:hover { background: #c9302c; }
-        button:disabled { background: #777; cursor: not-allowed; }
-        .result-card { background: #222; border-left: 4px solid #0275d8; }
-        .dossier-section { background: #1a1a1a; padding: 12px 15px; border-radius: 6px; margin-top: 10px; border-left: 4px solid #f0ad4e; }
-        .dossier-section h5 { margin: 0 0 8px 0; color: #f0ad4e; font-size: 1.05em; }
-        .dossier-section ul { margin: 0; padding-left: 20px; color: #ddd; font-size: 0.95em; }
-        .dossier-section li { margin-bottom: 8px; }
-        input[type="number"], select { width: 100%; padding: 8px; background: #222; color: #fff; border: 1px solid #555; border-radius: 4px; margin-top: 5px; box-sizing: border-box; }
-    </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>The Inference Mirror</title>
+    <link rel="preload" href="/static/fonts/SourceSerif4-Roman.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="/static/js/app.js" defer></script>
 </head>
 <body>
+    <main class="sheet">
 
-    <div class="card">
-        <h2>The Inference Mirror: HCI Surveillance Simulation</h2>
-        <p style="color: #bbb; font-size: 0.9em;">Configure the simulation parameters below to analyze how multi-vector tracking telemetry and interface design synthesize behavioral profiles.</p>
+        <header class="masthead">
+            <h1>The Inference Mirror</h1>
+            <p class="lede">See what a machine could guess about you from the data your devices give away. Describe a typical setup, and we'll show you the profile it builds.</p>
+        </header>
 
-        <div class="question-box">
-            <label>Q1: Digital Habituation & Session Length</label>
-            <span>Estimated daily active hours spent interacting with digital interfaces:</span>
-            <input type="number" id="q1" value="6" min="0" max="24" step="any" required>
-        </div>
+        <form id="profileForm">
 
-        <div class="question-box">
-            <label>Q2: Temporal Awareness & Off-Hours Usage</label>
-            <label style="font-weight: normal; color: #ccc;"><input type="checkbox" id="q2" checked> Active or background-synced sessions during late-night hours (12:00 AM – 5:00 AM)</label>
-        </div>
+            <fieldset class="section">
+                <legend class="section-title"><span class="section-mark">&sect;1</span> Your habits</legend>
 
-        <div class="question-box">
-            <label>Q3: Task Environment & Context</label>
-            <select id="q3">
-                <option value="Shopping">E-Commerce & Transactional Portals</option>
-                <option value="Social">Algorithmic Social Media Feeds</option>
-                <option value="News">Information Seeking & Sensitive Research</option>
-            </select>
-        </div>
+                <div class="q">
+                    <span class="q-num" aria-hidden="true">1.1</span>
+                    <div class="q-body">
+                        <label class="q-label" for="q1">How many hours a day are you on a screen?</label>
+                        <p class="q-help" id="q1-help">Phone, laptop and tablet together, anywhere from 0 to 24.</p>
+                        <p class="blank-line">
+                            <input type="number" id="q1" value="6" min="0" max="24" step="any" required aria-describedby="q1-help">
+                            <span aria-hidden="true">hours a day</span>
+                        </p>
+                    </div>
+                </div>
 
-        <div class="question-box">
-            <label>Q4: Interaction Cadence & Pacing</label>
-            <select id="q4">
-                <option value="Deliberate">Deliberate & Slow</option>
-                <option value="Steady">Steady & Predictable</option>
-                <option value="Rapid">Rapid & Impulsive</option>
-            </select>
-        </div>
+                <div class="q">
+                    <span class="q-num" aria-hidden="true">1.2</span>
+                    <div class="q-body">
+                        <div class="tick-row">
+                            <input type="checkbox" class="tick" id="q2" checked aria-describedby="q2-help">
+                            <label class="q-label" for="q2">I'm online between midnight and 5&nbsp;am</label>
+                        </div>
+                        <p class="q-help tick-help" id="q2-help">Or apps on my phone keep syncing in the background overnight.</p>
+                    </div>
+                </div>
 
-        <div class="question-box">
-            <label>Q5: System Transparency (Device Telemetry)</label>
-            <label style="font-weight: normal; color: #ccc;"><input type="checkbox" id="q5" checked> Background hardware profiling (battery discharge rate, screen specs) harvested invisibly</label>
-        </div>
+                <div class="q">
+                    <span class="q-num" aria-hidden="true">1.3</span>
+                    <div class="q-body">
+                        <p class="q-label" id="q3-label">What do you mostly do online?</p>
+                        <p class="q-help">Tick one.</p>
+                        <div class="choices" role="radiogroup" aria-labelledby="q3-label">
+                            <label class="choice"><input type="radio" name="q3" value="Shopping" checked> Shopping and paying for things</label>
+                            <label class="choice"><input type="radio" name="q3" value="Social"> Scrolling social media</label>
+                            <label class="choice"><input type="radio" name="q3" value="News"> Reading the news and looking up personal topics</label>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="question-box">
-            <label>Q6: Invisible Behavioral Biometrics</label>
-            <label style="font-weight: normal; color: #ccc;"><input type="checkbox" id="q6" checked> Millisecond typing pauses and mouse movement jitter being logged</label>
-        </div>
+                <div class="q">
+                    <span class="q-num" aria-hidden="true">1.4</span>
+                    <div class="q-body">
+                        <p class="q-label" id="q4-label">How do you usually browse?</p>
+                        <p class="q-help">Tick one.</p>
+                        <div class="choices" role="radiogroup" aria-labelledby="q4-label">
+                            <label class="choice"><input type="radio" name="q4" value="Deliberate" checked> Slowly, reading things properly</label>
+                            <label class="choice"><input type="radio" name="q4" value="Steady"> At a steady, regular pace</label>
+                            <label class="choice"><input type="radio" name="q4" value="Rapid"> Quickly, clicking whatever catches my eye</label>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
 
-        <div class="question-box">
-            <label>Q7: Attention & Engagement Proxies</label>
-            <label style="font-weight: normal; color: #ccc;"><input type="checkbox" id="q7" checked> System measuring exact scroll velocity and hover duration to infer cognitive focus</label>
-        </div>
+            <fieldset class="section">
+                <legend class="section-title"><span class="section-mark">&sect;2</span> What's being tracked</legend>
+                <p class="section-intro">Tick everything the apps and websites you use are allowed to collect.</p>
 
-        <div class="question-box">
-            <label>Q8: Intrusive Sensing & Consent</label>
-            <label style="font-weight: normal; color: #ccc;"><input type="checkbox" id="q8" checked> Webcam attention tracking or facial micro-expression scans active</label>
-        </div>
+                <div class="q">
+                    <span class="q-num" aria-hidden="true">2.1</span>
+                    <div class="q-body">
+                        <div class="tick-row">
+                            <input type="checkbox" class="tick" id="q5" checked aria-describedby="q5-help">
+                            <label class="q-label" for="q5">Details about my device</label>
+                        </div>
+                        <p class="q-help tick-help" id="q5-help">Battery level, screen size and other hardware facts, read without asking.</p>
+                    </div>
+                </div>
 
-        <div class="question-box">
-            <label>Q9: Privacy Tooling & Mitigation</label>
-            <select id="q9">
-                <option value="None">No protection / Standard browser</option>
-                <option value="AdBlock">Standard ad-blocker enabled</option>
-                <option value="VPN">Full privacy suite, ad-blocker & VPN active</option>
-            </select>
-        </div>
+                <div class="q">
+                    <span class="q-num" aria-hidden="true">2.2</span>
+                    <div class="q-body">
+                        <div class="tick-row">
+                            <input type="checkbox" class="tick" id="q6" checked aria-describedby="q6-help">
+                            <label class="q-label" for="q6">How I type and move the mouse</label>
+                        </div>
+                        <p class="q-help tick-help" id="q6-help">The tiny pauses between keystrokes, and the way the pointer wanders.</p>
+                    </div>
+                </div>
 
-        <div class="question-box">
-            <label>Q10: Algorithmic Nudging & Dark Patterns</label>
-            <label style="font-weight: normal; color: #ccc;"><input type="checkbox" id="q10" checked> Interface utilizing urgency timers, scarcity cues, or infinite scroll design</label>
-        </div>
+                <div class="q">
+                    <span class="q-num" aria-hidden="true">2.3</span>
+                    <div class="q-body">
+                        <div class="tick-row">
+                            <input type="checkbox" class="tick" id="q7" checked aria-describedby="q7-help">
+                            <label class="q-label" for="q7">What holds my attention</label>
+                        </div>
+                        <p class="q-help tick-help" id="q7-help">How fast I scroll, and how long I linger over things.</p>
+                    </div>
+                </div>
 
-        <div class="question-box">
-            <label>Q11: Persistent Cross-Device & Geolocation Telemetry</label>
-            <label style="font-weight: normal; color: #ccc;"><input type="checkbox" id="q11" checked> IP-derived location history and cross-device advertising IDs linked</label>
-        </div>
-        
-        <button id="runButton" onclick="runAI()">Execute AI Surveillance Simulation</button>
-    </div>
+                <div class="q">
+                    <span class="q-num" aria-hidden="true">2.4</span>
+                    <div class="q-body">
+                        <div class="tick-row">
+                            <input type="checkbox" class="tick" id="q8" checked aria-describedby="q8-help">
+                            <label class="q-label" for="q8">My face, through the camera</label>
+                        </div>
+                        <p class="q-help tick-help" id="q8-help">The webcam checks where I'm looking or reads my expressions.</p>
+                    </div>
+                </div>
 
-    <div class="card result-card" id="result" style="display:none;">
-        <h3>AI Algorithmic Profiling Dossier</h3>
-        
-        <p><strong>Conclusion Summary:</strong> <span id="conclusionOutput" style="color: #ff6b6b; font-weight: bold;">-</span></p>
-        
-        <hr style="border:0; border-top:1px solid #444; margin:15px 0;">
-        
-        <div class="dossier-section">
-            <h5>🧠 Inferred Personal & Sensitive Information</h5>
-            <ul id="keyInfoList"></ul>
-        </div>
-    </div>
+                <div class="q">
+                    <span class="q-num" aria-hidden="true">2.5</span>
+                    <div class="q-body">
+                        <div class="tick-row">
+                            <input type="checkbox" class="tick" id="q11" checked aria-describedby="q11-help">
+                            <label class="q-label" for="q11">Where I am, and which devices are mine</label>
+                        </div>
+                        <p class="q-help tick-help" id="q11-help">My rough location from my internet connection, with my phone and laptop linked as one person.</p>
+                    </div>
+                </div>
+            </fieldset>
 
-    <script>
-        async function runAI() {
-            const hoursInput = document.getElementById('q1');
-            // Block blank, negative or impossible hours before anything is sent
-            if (!hoursInput.reportValidity()) {
-                return;
-            }
+            <fieldset class="section">
+                <legend class="section-title"><span class="section-mark">&sect;3</span> Protection, and the tricks used on you</legend>
 
-            const runButton = document.getElementById('runButton');
-            // One request at a time, so a late response can't overwrite a newer one
-            runButton.disabled = true;
+                <div class="q">
+                    <span class="q-num" aria-hidden="true">3.1</span>
+                    <div class="q-body">
+                        <p class="q-label" id="q9-label">What do you use to protect your privacy?</p>
+                        <p class="q-help">Tick one.</p>
+                        <div class="choices" role="radiogroup" aria-labelledby="q9-label">
+                            <label class="choice"><input type="radio" name="q9" value="None" checked> Nothing, just a normal browser</label>
+                            <label class="choice"><input type="radio" name="q9" value="AdBlock"> An ad blocker</label>
+                            <label class="choice"><input type="radio" name="q9" value="VPN"> An ad blocker, a VPN and other privacy tools</label>
+                        </div>
+                    </div>
+                </div>
 
-            let payload = {
-                q1: Number(hoursInput.value),
-                q2: document.getElementById('q2').checked,
-                q3: document.getElementById('q3').value,
-                q4: document.getElementById('q4').value,
-                q5: document.getElementById('q5').checked,
-                q6: document.getElementById('q6').checked,
-                q7: document.getElementById('q7').checked,
-                q8: document.getElementById('q8').checked,
-                q9: document.getElementById('q9').value,
-                q10: document.getElementById('q10').checked,
-                q11: document.getElementById('q11').checked
-            };
+                <div class="q">
+                    <span class="q-num" aria-hidden="true">3.2</span>
+                    <div class="q-body">
+                        <div class="tick-row">
+                            <input type="checkbox" class="tick" id="q10" checked aria-describedby="q10-help">
+                            <label class="q-label" for="q10">Sites I use push me to act quickly</label>
+                        </div>
+                        <p class="q-help tick-help" id="q10-help">Countdown timers, &ldquo;only 2 left&rdquo; warnings, feeds that never end.</p>
+                    </div>
+                </div>
+            </fieldset>
 
-            document.getElementById('conclusionOutput').innerText = "Querying Local Llama 3.2 Model via Python API...";
-            document.getElementById('keyInfoList').replaceChildren(makeListItem("Processing telemetry streams..."));
-            document.getElementById('result').style.display = 'block';
+            <div class="submit-row">
+                <button type="submit" id="runButton" class="submit">
+                    <span class="btn-label">Show me what it can infer</span><span class="btn-arrow" aria-hidden="true">&rarr;</span>
+                </button>
+                <p class="submit-note">This runs on a small model on this computer, so it may take a few seconds.</p>
+            </div>
+        </form>
 
-            try {
-                let response = await fetch('/api/infer', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                let data = await response.json();
+        <section class="report" id="result" hidden aria-labelledby="resultTitle">
+            <header class="report-head">
+                <h2 id="resultTitle">Report</h2>
+                <p class="report-meta" id="reportMeta"></p>
+            </header>
+            <div id="resultBody" aria-live="polite"></div>
+        </section>
 
-                // The backend reports model failures as an error status; show them instead of results
-                if (!response.ok) {
-                    document.getElementById('conclusionOutput').innerText = "No inference available";
-                    let errorItem = document.createElement('li');
-                    errorItem.style.color = '#ff6b6b';
-                    errorItem.textContent = data.error || "The server could not produce an inference.";
-                    document.getElementById('keyInfoList').replaceChildren(errorItem);
-                    return;
-                }
+        <footer class="colophon">
+            <p>HCI group project 14. Nothing you enter here is stored or sent anywhere except to the model running on this machine.</p>
+        </footer>
 
-                document.getElementById('conclusionOutput').innerText = data.conclusion || "Analysis complete.";
-
-                // Model output is untrusted text: build the items as nodes, never as HTML
-                if (data.key_info && Array.isArray(data.key_info)) {
-                    document.getElementById('keyInfoList').replaceChildren(...data.key_info.map(makeInferenceItem));
-                } else {
-                    document.getElementById('keyInfoList').replaceChildren(makeListItem("No structured traits returned."));
-                }
-
-            } catch (err) {
-                console.error(err);
-                document.getElementById('conclusionOutput').innerText = "Connection Error";
-                let errorItem = makeListItem("Failed to connect to Python backend. Ensure app.py is running on port 5000 and Ollama is active!");
-                errorItem.style.color = '#ff6b6b';
-                document.getElementById('keyInfoList').replaceChildren(errorItem);
-            } finally {
-                runButton.disabled = false;
-            }
-        }
-
-        function makeListItem(text) {
-            const li = document.createElement('li');
-            li.textContent = text;
-            return li;
-        }
-
-        function makeInferenceItem(item) {
-            const li = document.createElement('li');
-
-            const info = document.createElement('strong');
-            info.textContent = String(item.info ?? '');
-            li.append(info, ` (Confidence: ${String(item.confidence ?? '?')}%)`, document.createElement('br'));
-
-            const evidence = document.createElement('span');
-            evidence.style.color = '#aaa';
-            evidence.style.fontSize = '0.9em';
-            evidence.textContent = `Evidence: ${String(item.evidence ?? '')}`;
-            li.append(evidence);
-
-            return li;
-        }
-    </script>
-
+    </main>
 </body>
 </html>
