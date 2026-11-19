@@ -4,7 +4,6 @@ from pathlib import Path
 from flask import Flask, request, jsonify, send_from_directory
 import math
 
-from flask import Flask, request, jsonify
 from flask_cors import CORS
 from LLM import infer_from_data, InferenceError
 
@@ -21,7 +20,7 @@ MAX_DAILY_HOURS = 24
 
 
 def parse_daily_hours(value):
-    """Return Q1 as a number of hours in [0, 24], or None if it is not one."""
+    # Return Q1 as a number of hours in [0, 24], or None if it is not one.
     # bool is a subclass of int, so rule it out explicitly
     if isinstance(value, bool) or value is None:
         return None
