@@ -1,0 +1,630 @@
+
+@font-face {
+    font-family: "Source Serif 4";
+    src: url("../fonts/SourceSerif4-Roman.woff2") format("woff2");
+    font-weight: 200 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Source Serif 4";
+    src: url("../fonts/SourceSerif4-Italic.woff2") format("woff2");
+    font-weight: 200 900;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "IBM Plex Mono";
+    src: url("../fonts/IBMPlexMono.woff2") format("woff2");
+    font-weight: 100 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+    /* Paper and ink */
+    --desk: #e6dfd1;
+    --paper: #f8f4ec;
+    --ink: #1f1c17;
+    --ink-2: #4a443a;
+    --ink-3: #6b6356;
+    --rule: rgba(31, 28, 23, 0.85);
+    --rule-soft: rgba(31, 28, 23, 0.16);
+
+    /* Red pen */
+    --pen: #a3301f;
+    --pen-dark: #82261a;
+
+    --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+
+    --gutter: 3.25rem;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    margin: 0;
+    background: var(--desk);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    font-optical-sizing: auto;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+}
+
+p {
+    margin: 0;
+}
+
+/* The sheet */
+
+.sheet {
+    max-width: 46rem;
+    margin: 2.5rem auto 4rem;
+    padding: 3rem 3.5rem 2.5rem;
+    background: var(--paper);
+    border: 1px solid rgba(31, 28, 23, 0.12);
+    box-shadow: 0 1px 0 rgba(31, 28, 23, 0.06), 0 12px 30px -18px rgba(31, 28, 23, 0.35);
+}
+
+/* Masthead */
+
+.form-ref {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--rule);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+}
+
+.masthead h1 {
+    margin: 1.4rem 0 0.75rem;
+    font-size: clamp(2.3rem, 1.6rem + 3vw, 3.4rem);
+    font-weight: 650;
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+}
+
+.lede {
+    max-width: 34em;
+    padding-bottom: 1.6rem;
+    border-bottom: 3px double var(--rule);
+    font-size: 1.2rem;
+    font-style: italic;
+    color: var(--ink-2);
+}
+
+/* Sections */
+
+.section {
+    margin: 2.75rem 0 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+}
+
+/* Floated so the legend sits in normal flow instead of on the fieldset border */
+.section-title {
+    float: left;
+    width: 100%;
+    padding: 0 0 0.45rem;
+    border-bottom: 1px solid var(--rule);
+    font-size: 1.4rem;
+    font-weight: 650;
+    letter-spacing: -0.005em;
+}
+
+.section-title + * {
+    clear: both;
+}
+
+.section-mark {
+    display: inline-block;
+    min-width: var(--gutter);
+    font-weight: 500;
+    font-style: italic;
+    color: var(--pen);
+}
+
+.section-intro {
+    padding: 0.9rem 0 0.2rem var(--gutter);
+    font-style: italic;
+    color: var(--ink-2);
+}
+
+/* Questions */
+
+.q {
+    display: grid;
+    grid-template-columns: var(--gutter) minmax(0, 1fr);
+    padding: 1rem 0 1.05rem;
+    border-bottom: 1px solid var(--rule-soft);
+}
+
+.q-num {
+    padding-top: 0.2rem;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--ink-3);
+}
+
+.q-label {
+    display: block;
+    font-weight: 560;
+}
+
+.q-help {
+    margin-top: 0.1rem;
+    font-size: 0.97rem;
+    font-style: italic;
+    color: var(--ink-2);
+}
+
+/* Fill-in-the-blank number */
+
+.blank-line {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    margin-top: 0.7rem;
+}
+
+.blank-line input {
+    width: 4.5ch;
+    padding: 0 0.2rem 0.1rem;
+    border: 0;
+    border-bottom: 1.5px solid var(--ink);
+    border-radius: 0;
+    background: transparent;
+    color: var(--pen);
+    font-family: var(--mono);
+    font-size: 1.25rem;
+    font-weight: 500;
+    text-align: center;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.blank-line input::-webkit-inner-spin-button,
+.blank-line input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.blank-line input:focus-visible {
+    outline: none;
+    border-bottom-width: 2.5px;
+    background: rgba(163, 48, 31, 0.06);
+}
+
+.blank-line input:user-invalid {
+    border-bottom-color: var(--pen);
+    background: rgba(163, 48, 31, 0.1);
+}
+
+.blank-line span {
+    font-style: italic;
+    color: var(--ink-2);
+}
+
+/* Tick boxes, with a pen tick that runs slightly out of the box */
+
+.tick-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+}
+
+.tick-row .q-label {
+    cursor: pointer;
+}
+
+.tick {
+    appearance: none;
+    flex: none;
+    width: 1.15rem;
+    height: 1.15rem;
+    margin: 0.22rem 0 0;
+    border: 1.5px solid var(--ink);
+    border-radius: 1px;
+    background: var(--paper) no-repeat 55% 30% / 125% 125%;
+    cursor: pointer;
+}
+
+.tick:checked {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 20'%3E%3Cpath d='M3.2 10.6c1.6 1.3 3.4 3.6 4.9 6.4 2.6-6 6.3-11 11.4-14.6' fill='none' stroke='%23a3301f' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.tick-help {
+    padding-left: calc(1.15rem + 0.8rem);
+}
+
+/* Tick-one choices, filled in like a pen mark */
+
+.choices {
+    display: grid;
+    gap: 0.35rem;
+    margin-top: 0.6rem;
+}
+
+.choice {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    cursor: pointer;
+}
+
+.choice input {
+    appearance: none;
+    flex: none;
+    width: 1.1rem;
+    height: 1.1rem;
+    margin: 0.25rem 0 0;
+    border: 1.5px solid var(--ink);
+    border-radius: 50%;
+    background: var(--paper);
+    cursor: pointer;
+}
+
+.choice input:checked {
+    background: var(--pen);
+    box-shadow: inset 0 0 0 2.5px var(--paper);
+}
+
+.choice:has(input:checked) {
+    color: var(--ink);
+}
+
+.choice:not(:has(input:checked)) {
+    color: var(--ink-2);
+}
+
+/* Submit */
+
+.submit-row {
+    margin-top: 2.5rem;
+    padding-top: 1.6rem;
+    border-top: 3px double var(--rule);
+    text-align: center;
+}
+
+.submit {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.7rem;
+    padding: 0.85rem 1.6rem 0.9rem;
+    border: 0;
+    border-radius: 2px;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.btn-arrow {
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.submit:hover {
+    background: var(--pen-dark);
+}
+
+.submit:hover .btn-arrow {
+    transform: translateX(4px);
+}
+
+.submit:disabled {
+    background: var(--ink-2);
+    cursor: progress;
+}
+
+.submit:disabled .btn-arrow {
+    transform: none;
+}
+
+.submit-note {
+    margin-top: 0.75rem;
+    font-size: 0.92rem;
+    font-style: italic;
+    color: var(--ink-3);
+}
+
+/* Report */
+
+.report {
+    margin-top: 3.25rem;
+    scroll-margin-top: 1.5rem;
+}
+
+.report-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 3px double var(--rule);
+}
+
+.report-head h2 {
+    margin: 0;
+    font-size: 1.9rem;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+}
+
+.report-meta {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+}
+
+.stamp {
+    float: right;
+    margin: 1.1rem 0 0.5rem 1rem;
+    padding: 0.25rem 0.55rem;
+    border: 2px solid var(--pen);
+    border-radius: 3px;
+    color: var(--pen);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transform: rotate(-4deg);
+    opacity: 0.88;
+}
+
+.summary {
+    padding: 1.2rem 0 1.4rem;
+    font-size: 1.35rem;
+    font-style: italic;
+    line-height: 1.4;
+}
+
+.inferences {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule);
+}
+
+.inference {
+    padding: 0.95rem 0 1rem;
+    border-bottom: 1px solid var(--rule-soft);
+}
+
+.inference-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+}
+
+.inference-title {
+    font-weight: 600;
+}
+
+.leader {
+    flex: 1 1 1.5rem;
+    min-width: 1.5rem;
+    border-bottom: 1.5px dotted var(--ink-3);
+    transform: translateY(-0.3em);
+}
+
+.inference-pct {
+    flex: none;
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.inference-scale {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0.45rem 0 0.4rem;
+}
+
+.meter {
+    flex: 0 1 13rem;
+    height: 0.55rem;
+    border: 1px solid var(--ink);
+}
+
+/* The final width is set inline, the animation only draws it in from zero */
+.meter-fill {
+    height: 100%;
+    background: var(--ink);
+    animation: draw-in 0.8s ease both;
+}
+
+/* Only the strongest guesses get the red pen */
+.inference[data-level="high"] .meter-fill {
+    background: var(--pen);
+}
+
+.inference[data-level="high"] .inference-pct {
+    color: var(--pen);
+}
+
+.inference-word {
+    font-size: 0.92rem;
+    font-style: italic;
+    color: var(--ink-2);
+}
+
+.inference-evidence {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--ink-2);
+}
+
+.inference-evidence span {
+    color: var(--ink-3);
+}
+
+/* Waiting: a typed line with a blinking caret */
+
+.typing {
+    padding: 1.4rem 0 0.4rem;
+    font-family: var(--mono);
+    font-size: 0.92rem;
+    color: var(--ink-2);
+}
+
+.caret {
+    display: inline-block;
+    width: 0.55em;
+    height: 1.05em;
+    margin-left: 0.15em;
+    vertical-align: -0.15em;
+    background: var(--ink);
+    animation: blink 1s steps(1) infinite;
+}
+
+/* Problems */
+
+.note {
+    margin-top: 1.3rem;
+    padding: 0.9rem 1.1rem;
+    border: 1.5px solid var(--pen);
+}
+
+.note-label {
+    margin-bottom: 0.2rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--pen);
+}
+
+.note-title {
+    font-weight: 600;
+}
+
+.note-detail {
+    margin-top: 0.3rem;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--ink-2);
+}
+
+.note-hint {
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+    font-style: italic;
+    color: var(--ink-2);
+}
+
+.empty {
+    padding: 1rem 0;
+    font-style: italic;
+    color: var(--ink-2);
+}
+
+/* Footer */
+
+.colophon {
+    margin-top: 3rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--rule);
+    font-size: 0.88rem;
+    font-style: italic;
+    color: var(--ink-3);
+}
+
+/* Motion */
+
+@keyframes draw-in {
+    from { width: 0; }
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Small screens if ever needed */
+
+@media (max-width: 640px) {
+    :root {
+        --gutter: 2.4rem;
+    }
+
+    body {
+        background: var(--paper);
+    }
+
+    .sheet {
+        margin: 0;
+        padding: 1.75rem 16px 2rem;
+        border: 0;
+        box-shadow: none;
+    }
+
+    .lede {
+        font-size: 1.1rem;
+    }
+
+    .summary {
+        font-size: 1.2rem;
+    }
+
+    .stamp {
+        float: none;
+        display: inline-block;
+        margin: 1rem 0 0;
+    }
+
+    .submit {
+        width: 100%;
+        justify-content: center;
+    }
+}
