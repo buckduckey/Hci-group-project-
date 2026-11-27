@@ -7,17 +7,63 @@
     <link rel="preload" href="/static/fonts/SourceSerif4-Roman.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/static/css/style.css">
     <script src="/static/js/app.js" defer></script>
+    <style>
+        .mode-switch { display: flex; gap: 0.5rem; margin: 1.5rem 0 2rem; border-bottom: 1px solid currentColor; padding-bottom: 1rem; }
+        .mode-btn { background: transparent; border: 1px solid currentColor; padding: 0.45rem 0.9rem; font: inherit; cursor: pointer; opacity: 0.65; }
+        .mode-btn[aria-pressed="true"] { opacity: 1; font-weight: 600; text-decoration: underline; text-underline-offset: 4px; }
+        .persona-box { width: 100%; box-sizing: border-box; font: inherit; padding: 0.75rem; border: 1px solid currentColor; background: transparent; color: inherit; resize: vertical; }
+        .preset-row { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.6rem; }
+        .preset-chip { background: transparent; border: 1px dashed currentColor; padding: 0.25rem 0.6rem; font: inherit; font-size: 0.85em; cursor: pointer; opacity: 0.85; }
+        .preset-chip:hover { opacity: 1; }
+        .mirror-stage { margin-bottom: 1.75rem; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(128, 128, 128, 0.35); }
+        .mirror-kicker { font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.7; margin: 0 0 0.35rem; }
+        .telemetry-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.4rem 1rem; list-style: none; padding: 0; margin: 0.5rem 0 0; font-size: 0.9em; }
+        .telemetry-grid li { display: flex; justify-content: space-between; border-bottom: 1px dotted rgba(128, 128, 128, 0.3); padding: 0.2rem 0; }
+    </style>
 </head>
 <body>
     <main class="sheet">
 
         <header class="masthead">
             <h1>The Inference Mirror</h1>
-            <p class="lede">See what a machine could guess about you from the data your devices give away. Describe a typical setup, and we'll show you the profile it builds.</p>
+            <p class="lede">See what a machine could guess about you from the data your devices give away. Describe a typical setup, or test how well an AI reconstructs a hidden persona from raw telemetry alone.</p>
         </header>
 
-        <form id="profileForm">
+        <nav class="mode-switch" aria-label="Simulation mode">
+            <button type="button" class="mode-btn" id="modeManualBtn" aria-pressed="true">1. Manual telemetry setup</button>
+            <button type="button" class="mode-btn" id="modePersonaBtn" aria-pressed="false">2. Blind persona test</button>
+        </nav>
 
+        <form id="personaForm" hidden>
+            <fieldset class="section">
+                <legend class="section-title"><span class="section-mark">&sect;P</span> Describe a person</legend>
+                <p class="section-intro">Write a short bio. Step 1 turns your description into raw device metrics. Step 2 strips every word of your bio away and asks a blank-slate model to guess who this person is from the metrics alone.</p>
+
+                <div class="q">
+                    <span class="q-num" aria-hidden="true">P.1</span>
+                    <div class="q-body">
+                        <label class="q-label" for="personaInput">Who is this person, and what are their habits?</label>
+                        <p class="q-help" id="persona-help">Mention their schedule, mood, browsing habits, or privacy awareness—none of these words will be shown to the profiling model.</p>
+                        <textarea class="persona-box" id="personaInput" rows="4" maxlength="1000" required aria-describedby="persona-help" placeholder="e.g., An exhausted university student cramming for finals at 3 AM, impulsively buying snacks online on a phone with no ad blocker."></textarea>
+                        <div class="preset-row" aria-label="Example personas">
+                            <button type="button" class="preset-chip" data-persona="An exhausted university student cramming for finals at 3 AM, rapidly switching tabs and impulsively shopping online with no privacy tools.">Cramming student (3 AM)</button>
+                            <button type="button" class="preset-chip" data-persona="A privacy-conscious investigative journalist reading articles slowly during work hours on a laptop protected by a VPN and ad blocker.">Privacy-minded journalist</button>
+                            <button type="button" class="preset-chip" data-persona="A lonely retiree scrolling social media feeds late at night on a tablet with default settings and countdown-timer ads.">Late-night social scroller</button>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <div class="submit-row">
+                <button type="submit" id="runPersonaButton" class="submit">
+                    <span class="btn-label">Strip descriptors &amp; run blind inference</span><span class="btn-arrow" aria-hidden="true">&rarr;</span>
+                </button>
+                <p class="submit-note">Runs two separate local model passes (telemetry synthesis, then blind profiling), so it takes about 10–15 seconds.</p>
+            </div>
+        </form>
+
+        <form id="profileForm">
+            <!-- Keep your exact existing §1, §2, §3 fieldsets and #runButton here unchanged -->
             <fieldset class="section">
                 <legend class="section-title"><span class="section-mark">&sect;1</span> Your habits</legend>
 

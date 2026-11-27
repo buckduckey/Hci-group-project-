@@ -1,20 +1,69 @@
 // questionnaire -> /api/infer -> report
+// persona bio -> /api/persona -> stripped telemetry + blind report
 
 const form = document.getElementById('profileForm');
+const personaForm = document.getElementById('personaForm');
+const personaInput = document.getElementById('personaInput');
 const hoursInput = document.getElementById('q1');
+
 const runButton = document.getElementById('runButton');
 const buttonLabel = runButton.querySelector('.btn-label');
+const runPersonaButton = document.getElementById('runPersonaButton');
+const personaButtonLabel = runPersonaButton.querySelector('.btn-label');
+
+const modeManualBtn = document.getElementById('modeManualBtn');
+const modePersonaBtn = document.getElementById('modePersonaBtn');
+
 const resultCard = document.getElementById('result');
 const resultBody = document.getElementById('resultBody');
 const reportMeta = document.getElementById('reportMeta');
 
 const IDLE_LABEL = buttonLabel.textContent;
+const PERSONA_IDLE_LABEL = personaButtonLabel.textContent;
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+const TELEMETRY_LABELS = {
+    q1: 'Screen hours/day',
+    q2: 'Late-night (12–5 AM)',
+    q3: 'Primary activity',
+    q4: 'Browsing cadence',
+    q5: 'Device telemetry',
+    q6: 'Keystroke/mouse logs',
+    q7: 'Scroll/hover tracking',
+    q8: 'Webcam face scans',
+    q9: 'Privacy tooling',
+    q10: 'Dark patterns present',
+    q11: 'Cross-device/IP linked'
+};
+
+modeManualBtn.addEventListener('click', () => switchMode('manual'));
+modePersonaBtn.addEventListener('click', () => switchMode('persona'));
+
+document.querySelectorAll('.preset-chip').forEach((chip) => {
+    chip.addEventListener('click', () => {
+        personaInput.value = chip.dataset.persona || '';
+        personaInput.focus();
+    });
+});
 
 form.addEventListener('submit', (event) => {
     event.preventDefault();
     runAI();
 });
+
+personaForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    runPersona();
+});
+
+function switchMode(mode) {
+    const isPersona = mode === 'persona';
+    form.hidden = isPersona;
+    personaForm.hidden = !isPersona;
+    modeManualBtn.setAttribute('aria-pressed', String(!isPersona));
+    modePersonaBtn.setAttribute('aria-pressed', String(isPersona));
+    resultCard.hidden = true;
+}
 
 function ticked(id) {
     return document.getElementById(id).checked;
@@ -25,18 +74,14 @@ function chosen(name) {
 }
 
 async function runAI() {
-    // Block blank, negative or impossible hours before anything is sent
     if (!hoursInput.reportValidity()) {
         return;
     }
-
-    // One request at a time
-    if (runButton.disabled) {
+    if (runButton.disabled || runPersonaButton.disabled) {
         return;
     }
     setBusy(true);
 
-    // The keys and values here are the backend contract (see app.py and tests/)
     const payload = {
         q1: Number(hoursInput.value),
         q2: ticked('q2'),
@@ -51,7 +96,7 @@ async function runAI() {
         q11: ticked('q11')
     };
 
-    showWaiting();
+    showWaiting('Reading your answers and drawing conclusions');
 
     try {
         const response = await fetch('/api/infer', {
@@ -62,7 +107,6 @@ async function runAI() {
 
         const data = await response.json().catch(() => ({}));
 
-        // The backend reports model failures as an error status
         if (!response.ok) {
             showProblem(
                 "The model couldn't put a profile together this time.",
@@ -83,10 +127,57 @@ async function runAI() {
     }
 }
 
+async function runPersona() {
+    if (!personaInput.reportValidity()) {
+        return;
+    }
+    if (runButton.disabled || runPersonaButton.disabled) {
+        return;
+    }
+    const personaText = personaInput.value.trim();
+    if (!personaText) {
+        return;
+    }
+
+    setBusy(true);
+    showWaiting('Step 1/2: Translating persona into raw telemetry, then running blind inference');
+
+    try {
+        const response = await fetch('/api/persona', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ persona: personaText })
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+            showProblem(
+                "The blind persona simulation couldn't finish.",
+                data.error || 'The server could not complete both model passes.'
+            );
+            return;
+        }
+
+        showPersonaReport(personaText, data.telemetry, data.inference);
+    } catch (err) {
+        console.error(err);
+        showProblem(
+            "We can't reach the simulation on this computer.",
+            'Check that app.py is running on port 5000 and that Ollama is open.'
+        );
+    } finally {
+        setBusy(false);
+    }
+}
+
 function setBusy(busy) {
     runButton.disabled = busy;
+    runPersonaButton.disabled = busy;
     runButton.setAttribute('aria-busy', String(busy));
+    runPersonaButton.setAttribute('aria-busy', String(busy));
     buttonLabel.textContent = busy ? 'Reading your answers…' : IDLE_LABEL;
+    personaButtonLabel.textContent = busy ? 'Simulating & profiling…' : PERSONA_IDLE_LABEL;
 }
 
 function revealReport() {
@@ -97,14 +188,18 @@ function revealReport() {
 function el(tag, className, text) {
     const node = document.createElement(tag);
     if (className) node.className = className;
-    // Model output is untrusted text
     if (text !== undefined) node.textContent = String(text);
     return node;
 }
 
-function showWaiting() {
+function formatTimestamp() {
+    const now = new Date();
+    return `Prepared ${now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}, ${now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`;
+}
+
+function showWaiting(message) {
     reportMeta.textContent = '';
-    const line = el('p', 'typing', 'Reading your answers and drawing conclusions');
+    const line = el('p', 'typing', message || 'Reading your answers and drawing conclusions');
     line.append(el('span', 'caret'));
     line.lastChild.setAttribute('aria-hidden', 'true');
 
@@ -113,10 +208,7 @@ function showWaiting() {
     revealReport();
 }
 
-function showReport(data) {
-    const now = new Date();
-    reportMeta.textContent = `Prepared ${now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}, ${now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`;
-
+function buildDossierNodes(data) {
     const stamp = el('p', 'stamp', 'Guesses, not facts');
     const summary = el('p', 'summary', data.conclusion || 'The model finished without a summary.');
 
@@ -129,8 +221,45 @@ function showReport(data) {
         details = el('p', 'empty', 'The model gave no specific guesses this time.');
     }
 
+    return [stamp, summary, details];
+}
+
+function showReport(data) {
+    reportMeta.textContent = formatTimestamp();
     resultBody.removeAttribute('aria-busy');
-    resultBody.replaceChildren(stamp, summary, details);
+    resultBody.replaceChildren(...buildDossierNodes(data));
+}
+
+function showPersonaReport(personaText, telemetry, inference) {
+    reportMeta.textContent = `${formatTimestamp()} · Blind simulation`;
+
+    const stage1 = el('div', 'mirror-stage');
+    stage1.append(
+        el('p', 'mirror-kicker', '1. Hidden persona (withheld from profiler)'),
+        el('p', '', personaText)
+    );
+
+    const stage2 = el('div', 'mirror-stage');
+    stage2.append(
+        el('p', 'mirror-kicker', '2. Stripped telemetry (all descriptors removed — only data sent to profiler)')
+    );
+    const grid = el('ul', 'telemetry-grid');
+    Object.entries(TELEMETRY_LABELS).forEach(([key, label]) => {
+        const li = el('li');
+        const val = telemetry && key in telemetry ? String(telemetry[key]) : '—';
+        li.append(el('span', '', label), el('strong', '', val));
+        grid.append(li);
+    });
+    stage2.append(grid);
+
+    const stage3 = el('div');
+    stage3.append(
+        el('p', 'mirror-kicker', '3. Blind AI reconstruction'),
+        ...buildDossierNodes(inference || {})
+    );
+
+    resultBody.removeAttribute('aria-busy');
+    resultBody.replaceChildren(stage1, stage2, stage3);
 }
 
 function showProblem(title, detail) {
@@ -141,7 +270,7 @@ function showProblem(title, detail) {
         el('p', 'note-label', 'Something went wrong'),
         el('p', 'note-title', title),
         el('p', 'note-detail', detail),
-        el('p', 'note-hint', 'Your answers are still filled in, so you can try again.')
+        el('p', 'note-hint', 'Your inputs are still filled in, so you can try again.')
     );
 
     resultBody.removeAttribute('aria-busy');
